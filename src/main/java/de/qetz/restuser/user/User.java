@@ -8,13 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "user")
-
-// Using lombok because we don't want to write getters and setters
-//
-// Writing "getters" and "setters" instead of "mutators" and "accessors" because
-// mutators and accessors can be without "get" and "set"; getters and setters can't.
-@Setter
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,12 +1,10 @@
 package de.qetz.restuser;
 
 import de.qetz.restuser.user.User;
-import de.qetz.restuser.user.UserRepository;
+import de.qetz.restuser.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 
@@ -17,10 +15,10 @@ import java.util.stream.Collectors;
 
 @RestController
 public final class RestuserApi implements UserApi, UsersApi {
-  private final UserRepository repository;
+  private final UserController repository;
 
   @Autowired
-  private RestuserApi(UserRepository repository) {
+  private RestuserApi(UserController repository) {
     this.repository = repository;
   }
 
