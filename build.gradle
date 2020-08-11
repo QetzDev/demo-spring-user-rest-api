@@ -1,0 +1,101 @@
+plugins {
+  id 'org.springframework.boot' version '2.3.2.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+  id 'com.github.johnrengelman.shadow' version '6.0.0'
+  id 'java'
+  id "org.openapi.generator" version "4.3.1"
+}
+
+group = 'de.qetz'
+version = '0.0.1'
+sourceCompatibility = '14'
+
+tasks.withType(JavaCompile).all {
+  options.compilerArgs += ['--enable-preview']
+}
+
+repositories {
+  google()
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-web:2.3.1.RELEASE'
+
+  implementation 'com.google.code.gson:gson:2.8.5'
+  compile 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
+  implementation 'javax.validation:validation-api:2.0.1.Final'
+  implementation 'org.openapitools:jackson-databind-nullable:0.1.0'
+  implementation 'io.springfox:springfox-swagger2:3.0.0'
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+
+  runtimeOnly 'mysql:mysql-connector-java'
+
+  testCompile 'junit:junit:4.13'
+  testImplementation('org.springframework.boot:spring-boot-starter-test') {
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
+}
+
+test {
+  useJUnitPlatform()
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = [
+        'build/generated-sources/src/main/java',
+        'src/main/java'
+      ]
+    }
+  }
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'de.qetz.restuser.RestuserApplication'
+  }
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+openApiMeta {
+  generatorName = "Qetz"
+  packageName = "de.qetz.restuser"
+  outputFolder = "$buildDir/meta".toString()
+}
+
+openApiValidate {
+  inputSpec = "$rootDir/src/main/openapi/de-qetz-restuser.yml".toString()
+  recommend = true
+}
+
+openApiGenerate {
+  generatorName = "spring"
+  inputSpec = "$rootDir/src/main/openapi/de-qetz-restuser.yml".toString()
+  outputDir = "$buildDir/generated-sources".toString()
+  apiPackage = "de.qetz.restuser"
+  invokerPackage = "de.qetz.restuser"
+  modelPackage = "de.qetz.restuser"
+  modelNameSuffix = "Dto"
+  configOptions = [
+    dateLibrary   : "java14",
+    developerEmail: "general@qetz.de",
+    developerName : "Qetz",
+    groupId       : "de.qetz",
+    interfaceOnly : "true",
+    invokerPackage: "de.qetz.restuser",
+    title         : "Qetz User Rest Api"
+  ]
+  skipValidateSpec = false
+  logToStderr = true
+  generateAliasAsModel = false
+  enablePostProcessFile = false
+}

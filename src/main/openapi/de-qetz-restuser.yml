@@ -1,0 +1,193 @@
+openapi: 3.0.3
+
+info:
+  title: Qetz User Rest Api
+  description: API description in Markdown.
+  version: 0.0.1
+  contact:
+    name: Qetz
+    email: general@qetz.de
+    url: https://qetz.de
+
+servers:
+  - url: localhost:8080
+    description: The test server
+
+paths:
+  /users:
+    get:
+      summary: List all users
+      operationId: findUsers
+      tags:
+        - User
+      responses:
+        200:
+          $ref: '#/components/responses/UsersResponse'
+      security:
+        - OAuth2:
+            - users_list
+  /user:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      tags:
+        - User
+      requestBody:
+        $ref: '#/components/requestBodies/UserCreation'
+      responses:
+        200:
+          $ref: '#/components/responses/UserCreationResponse'
+      security:
+        - OAuth2:
+            - user_create
+  /user/{id}:
+    get:
+      summary: Get certain user
+      operationId: findUser
+      tags:
+        - User
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        200:
+          $ref: '#/components/responses/UserResponse'
+      security:
+        - OAuth2:
+            - user_info
+    put:
+      summary: Update a user
+      operationId: updateUser
+      tags:
+        - User
+      requestBody:
+        $ref: '#/components/requestBodies/UserEmailUpdate'
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        200:
+          $ref: '#/components/responses/UserUpdateResponse'
+      security:
+        - OAuth2:
+            - user_update
+    delete:
+      summary: Delete a user
+      operationId: deleteUser
+      tags:
+        - User
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        204:
+          description: User deleted
+        409:
+          description: User deletion failed due to resource dependencies
+      security:
+        - OAuth2:
+            - user_delete
+
+tags:
+  - name: User
+    description: All information and tasks about users
+
+components:
+  responses:
+    UsersResponse:
+      description: A complete list of all users
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Users'
+    UserCreationResponse:
+      description: The created user entry
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    UserResponse:
+      description: User info
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    UserUpdateResponse:
+      description: Updated user info
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+
+  requestBodies:
+    UserCreation:
+      description: Payload used to create a new user entry
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCreation'
+    UserEmailUpdate:
+      description: Email used to update a user entry
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserEmailUpdate'
+
+  parameters:
+    Id:
+      name: id
+      description: The unique id of a user
+      schema:
+        type: integer
+      in: path
+      required: true
+
+  schemas:
+    Users:
+      description: A list of all users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    User:
+      description: An overview of a user
+      properties:
+        id:
+          type: integer
+        UserId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+    UserCreation:
+      type: object
+      properties:
+        UserId:
+          type: string
+          format: uuid
+          description:  The minecraft uuid of a player
+        email:
+          type: string
+          format: email
+          description: The email of a user
+    UserEmailUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email of a user
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: localhost
+          tokenUrl: localhost
+          scopes:
+            users_list: List a user
+            user_create: Create a user
+            user_info: Shows info of a user
+            user_update: Update a user
+            user_delete: Delete a user
